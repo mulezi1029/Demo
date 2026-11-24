@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldingReader · 飞书式折叠阅读器</title>
+<link rel="stylesheet" href="reader.css">
+<link rel="stylesheet" href="demo.css">
+</head>
+<body>
+
+<header class="app-header">
+  <button class="icon-btn" id="toggle-toc" type="button" title="显示 / 隐藏目录" aria-label="显示或隐藏目录">
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+      <path d="M2 4h12M2 8h12M2 12h12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
+  <div class="app-title">
+    FoldingReader
+    <span class="app-sub">飞书式标题折叠 · 纯静态零依赖</span>
+  </div>
+  <div class="app-actions">
+    <input id="search" class="app-search" type="search" placeholder="搜索正文（⌘F）" aria-label="搜索正文">
+    <div class="presets">
+      <button type="button" data-action="expand-all">全部展开</button>
+      <button type="button" data-action="expand-depth" data-depth="2">到 H2</button>
+      <button type="button" data-action="collapse-all">全部折叠</button>
+    </div>
+  </div>
+</header>
+
+<div class="reading-progress"><span id="progress"></span></div>
+
+<div class="app-body">
+  <aside class="app-sidebar">
+    <div class="sidebar-head">目录 <span class="hint">与正文联动</span></div>
+    <nav id="toc" class="rf-toc" aria-label="文档目录"></nav>
+  </aside>
+
+  <main class="app-main">
+    <article id="doc" class="doc"></article>
+    <footer class="doc-footer">
+      FoldingReader demo · 折叠状态保存在浏览器本地，刷新后保留 · 清空可点「全部展开」再刷新
+    </footer>
+  </main>
+</div>
+
+<!--
+  正文源：任意一段扁平结构的 HTML 都能塞进来（标题之间不要包额外的 div，
+  否则同级标题不再是兄弟节点，切树会断）。
+-->
+<template id="doc-source">
+  <h1>折叠阅读器 · 设计说明</h1>
+  <p class="doc-meta">最后更新 2026-11-24 · 阅读约 6 分钟 · 示例文档</p>
+
+  <p>这份文档本身就是这个组件的输出：它由一段普通的 HTML 渲染而来，没有编辑器、没有后端，
+      折叠完全发生在浏览器里。<strong>把鼠标移到任意标题左侧</strong>，会出现折叠和复制按钮。</p>
+
+  <blockquote>折叠不是新的数据，它只是渲染层的一种状态。</blockquote>
+
+  <p class="doc-tip">试试这几件事：折叠第 3 节，左侧目录会跟着收起；在右上角搜索「section」，
+    被折叠的章节会自动展开并高亮；刷新页面，折叠状态还在。</p>
+
+  <h2 id="problem">1. 要解决什么问题</h2>
+  <p>技术方案、PRD、评审纪要这类文档动辄几千字，读者真正关心的往往只有两三节。
+      在长文档里滚动定位的成本，比写清楚内容本身还高。</p>
+
+  <h3 id="problem-before">1.1 常见做法</h3>
+  <ul>
+    <li><strong>只用 Markdown</strong>：渲染器只负责排版，标题不可折叠，长文档只能靠目录跳转；</li>
+    <li><strong>拆成多页</strong>：层级关系被切断，跨节查阅要来回点击；</li>
+    <li><strong>折叠整个块组件</strong>：能折，但和标题语义脱钩，没法按层级展开。</li>
+  </ul>
+
+  <h3 id="problem-goal">1.2 目标效果</h3>
+  <ol>
+    <li>按标题层级折叠，折叠一节等于收起它下面的整棵子树；</li>
+    <li>目录和正文是同一份结构，折叠状态天然联动；</li>
+    <li>折叠状态可持久化，下次打开保持原样；</li>
+    <li>不引入构建流程，一个 <code>.html</code> 双击就能看。</li>
+  </ol>
+
+  <h2 id="compare">2. 方案对比</h2>
+  <table>
+    <thead>
+      <tr><th>方案</th><th>折叠</th><th>目录联动</th><th>成本</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>原生 Markdown</td><td>不支持</td><td>独立生成，需手动同步</td><td>最低</td></tr>
+      <tr><td>Markdown + <code>&lt;details&gt;</code></td><td>支持</td><td>标题语义丢失</td><td>低</td></tr>
+      <tr><td>编辑器内核（Tiptap 等）</td><td>支持</td><td>天然一致</td><td>引入框架与构建</td></tr>
+      <tr><td>渲染后重写结构（本项目）</td><td>支持</td><td>同树天然一致</td><td>约 400 行脚本</td></tr>
+    </tbody>
+  </table>
+  <p>我们只需要「读」，不需要「写」，所以第四种最划算：内容已经是最终形态，
+      缺的只是渲染之后的一次结构重写。</p>
+
+  <h2 id="how">3. 实现原理</h2>
+
+  <h3 id="how-structure">3.1 结构映射</h3>
+  <p>飞书文档把正文当作块树，标题块拥有它后面的兄弟块。这里用同样的思路，把线性的 HTML 切成分层的 section：</p>
+  <pre><code>&lt;section class="rf-section" data-level="2"&gt;
+  &lt;h2&gt;3. 实现原理&lt;/h2&gt;
+  &lt;div class="rf-body"&gt;&lt;div class="rf-body-inner"&gt;
+    &lt;p&gt;…&lt;/p&gt;
+    &lt;section class="rf-section" data-level="3"&gt;
+      &lt;h3&gt;3.1 结构映射&lt;/h3&gt;
+      …
+    &lt;/section&gt;
+  &lt;/div&gt;&lt;/div&gt;
+&lt;/section&gt;</code></pre>
+  <p>切树要从最深的标题往上处理：先包 H3，再包 H2 时，H3 的 section 已经是一个整体，
+      会被自然地收进 H2 的 body，嵌套关系不需要额外维护。</p>
+
+  <h3 id="how-state">3.2 折叠状态</h3>
+  <p>折叠只是 section 上的一个类：<code>is-collapsed</code>。样式用 grid 行高过渡做动画，
+      不用猜 <code>max-height</code> 的具体数值：</p>
+  <pre><code>.rf-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .2s; }
+.rf-section.is-collapsed &gt; .rf-body { grid-template-rows: 0fr; visibility: hidden; }
+.rf-body-inner { min-height: 0; overflow: hidden; }</code></pre>
+  <p>隐藏用 <code>visibility</code> 而不是 <code>display: none</code>，是为了让折叠动画能过渡完，
+      同时把内容移出 Tab 焦点顺序。</p>
+
+  <h3 id="how-toc">3.3 目录联动</h3>
+  <p>目录不是另建一份数据，而是同一棵树生成的镜像。所以「父节点折叠，子节点自动不可见」这件事
+      用 CSS 就完成了；JS 只需要处理飞书的那条规则：</p>
+  <blockquote>正文标题折叠会强制目录节点折叠；目录节点的折叠不会反过来影响正文。</blockquote>
+  <p>点击目录条目时，反过来要把整条祖先链展开，否则会出现「跳过去却看不见」。</p>
+
+  <h2 id="detail">4. 交互细节</h2>
+
+  <h3 id="detail-hover">4.1 悬停按钮</h3>
+  <p>按钮绝对定位在标题左侧的留白里（<code>left: -3.2rem</code>），默认 <code>opacity: 0</code>，
+      悬停或键盘聚焦时出现。这样标题文本不会被按钮污染，复制、搜索取文本时也干净。</p>
+
+  <h3 id="detail-search">4.2 搜索展开</h3>
+  <p>用 <code>TreeWalker</code> 遍历文本节点，命中后包一层 <code>&lt;mark&gt;</code>，
+      然后展开命中项的祖先链——对应飞书「⌘F 搜索会一次性展开所有折叠标题」的行为。
+      清空搜索时把 mark 拆掉并 <code>normalize()</code> 合并回文本节点。</p>
+
+  <h3 id="detail-persist">4.3 状态记忆</h3>
+  <p>存储的键不是 section 的 id，而是「标题文本链」（例如 <code>3. 实现原理 / 3.1 结构映射</code>）。
+      这样即使文档内容有增删，只要标题没改，折叠状态就不会错位。</p>
+
+  <h2 id="edge">5. 边界与坑</h2>
+  <ul>
+    <li><strong>标题必须是兄弟节点</strong>：如果标题被包在 <code>&lt;div&gt;</code> 里，
+        同级扫描会断。要么保持扁平，要么在切树前先把包装层拆掉。</li>
+    <li><strong>锚点 id</strong>：切树时把原有 <code>id</code> 留在标题上，
+        section 另起内部 id，避免深链接失效和重复 id。</li>
+    <li><strong>打印</strong>：折叠内容在打印时会消失，接入方可以在
+        <code>beforeprint</code> 时调用 <code>expandAll()</code>。</li>
+    <li><strong>localStorage 不可用</strong>：隐私模式或被策略禁用时静默降级，不影响阅读。</li>
+    <li><strong>性能</strong>：切树是 O(n) 的 DOM 搬移，几千行的文档也在毫秒级；
+        但章节特别多时，目录构建会变慢，可以按需懒渲染。</li>
+  </ul>
+
+  <h2 id="usage">6. 接入方式</h2>
+  <p>引入两个文件，给一个容器和一个目录节点：</p>
+  <pre><code>&lt;link rel="stylesheet" href="reader.css"&gt;
+&lt;script src="reader.js"&gt;&lt;/script&gt;
+
+&lt;nav id="toc"&gt;&lt;/nav&gt;
+&lt;article id="doc"&gt;…你的 HTML 或 Markdown 渲染结果…&lt;/article&gt;
+
+&lt;script&gt;
+  const reader = new FoldingReader('#doc', {
+    toc: '#toc',
+    searchInput: '#search',
+    storageKey: 'my-doc',
+    maxLevel: 3,
+  });
+&lt;/script&gt;</code></pre>
+  <p>Markdown 源也可以：先用 <code>marked</code> 渲染成 HTML，再交给 <code>FoldingReader</code>，
+      折叠逻辑与源格式无关。</p>
+
+  <h2 id="feishu">7. 与飞书文档的对照</h2>
+  <table>
+    <thead>
+      <tr><th>行为</th><th>飞书</th><th>本项目</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>悬停标题出现折叠按钮</td><td>✅</td><td>✅</td></tr>
+      <tr><td>折叠隐藏整棵子树</td><td>✅</td><td>✅</td></tr>
+      <tr><td>目录随正文折叠</td><td>✅</td><td>✅</td></tr>
+      <tr><td>折叠状态持久化</td><td>✅（存在块属性里）</td><td>✅（localStorage）</td></tr>
+      <tr><td>搜索自动展开折叠章节</td><td>✅</td><td>✅（自建搜索框）</td></tr>
+      <tr><td>复制折叠章节全部内容</td><td>✅</td><td>✅（纯文本）</td></tr>
+      <tr><td>一键折叠 / 展开全部</td><td>❌</td><td>✅（示例扩展，可关掉）</td></tr>
+      <tr><td>共编、评论、块拖拽</td><td>✅</td><td>❌（只读场景）</td></tr>
+    </tbody>
+  </table>
+
+  <h2 id="next">8. 还能做什么</h2>
+  <ol>
+    <li>把折叠状态写进 URL，方便分享「只展开第 3 节」的视图；</li>
+    <li>阅读位置记忆，回到上次滚动到的地方；</li>
+    <li>全文检索换成倒排索引，支持多关键词与上下文摘要；</li>
+    <li>导出：一键把当前可见结构导出为带 <code>&lt;details&gt;</code> 的 Markdown。</li>
+  </ol>
+
+  <h2 id="faq">9. FAQ</h2>
+  <h3 id="faq-one">能不能直接渲染 Markdown 文件？</h3>
+  <p>可以。先转 HTML 再交进来即可。要注意 <code>file://</code> 下浏览器禁止 <code>fetch</code>
+      本地文件，双击打开时请把 Markdown 渲染结果内联进页面。</p>
+  <h3 id="faq-two">为什么折叠后目录也跟着收起，能分开吗？</h3>
+  <p>这是刻意对齐飞书的单向联动：正文是事实，目录是视图。如果你想要两者独立，
+      把 <code>toggle()</code> 里调用 <code>collapseTocNode</code> 的那行删掉即可。</p>
+  <h3 id="faq-three">章节很多时目录太长怎么办？</h3>
+  <p>把 <code>maxLevel</code> 调小（例如 2），H3 以下就不进目录、也不可折叠；
+      或者保留折叠但只渲染前两级到目录。</p>
+</template>
+
+<script src="reader.js"></script>
+<script src="demo.js"></script>
+</body>
+</html>

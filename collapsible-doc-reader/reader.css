@@ -1,0 +1,228 @@
+/* ==========================================================================
+   FoldingReader 组件样式（不含页面骨架，页面骨架见 demo.css）
+   依赖的 CSS 变量：--fg --muted --hover --accent --accent-weak --line
+   ========================================================================== */
+
+.rf-section {
+  position: relative;
+}
+
+.rf-section > :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+
+/* ---------- 标题左侧的折叠 / 复制按钮（悬停出现，和飞书一致） ---------- */
+
+.rf-controls {
+  position: absolute;
+  left: -3.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.rf-section > :is(h1, h2, h3, h4, h5, h6):hover > .rf-controls,
+.rf-section > :is(h1, h2, h3, h4, h5, h6):focus-within > .rf-controls {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .rf-controls {
+    opacity: 0.85;
+  }
+}
+
+.rf-toggle,
+.rf-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.rf-toggle:hover,
+.rf-copy:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.rf-toggle:focus-visible,
+.rf-copy:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.rf-toggle svg {
+  transition: transform 0.18s ease;
+}
+
+.rf-toggle[aria-expanded="false"] svg {
+  transform: rotate(-90deg);
+}
+
+.rf-copy {
+  width: 20px;
+  height: 20px;
+}
+
+/* ---------- 折叠：height 动画用 grid 行高过渡，避免 max-height 猜数值 ---------- */
+
+.rf-body {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.2s ease, visibility 0.2s;
+}
+
+.rf-section.is-collapsed > .rf-body {
+  grid-template-rows: 0fr;
+  visibility: hidden;
+}
+
+.rf-body-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ---------- 搜索命中 ---------- */
+
+mark.rf-hit {
+  padding: 0 1px;
+  border-radius: 2px;
+  background: #ffe58f;
+  color: inherit;
+}
+
+/* ---------- 目录 ---------- */
+
+.rf-toc {
+  font-size: 13px;
+  line-height: 1.5;
+  user-select: none;
+}
+
+.rf-toc-list,
+.rf-toc-sublist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rf-toc-sublist[hidden] {
+  display: none;
+}
+
+.rf-toc-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px 4px 4px;
+  border-radius: 6px;
+  transition: background 0.12s ease;
+}
+
+.rf-toc-row:hover {
+  background: var(--hover);
+}
+
+.rf-toc-row.is-active {
+  background: var(--accent-weak);
+}
+
+.rf-toc-row.is-active .rf-toc-link {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.rf-toc-item[data-level="2"] > .rf-toc-row {
+  padding-left: 14px;
+}
+
+.rf-toc-item[data-level="3"] > .rf-toc-row {
+  padding-left: 28px;
+}
+
+.rf-toc-item[data-level="4"] > .rf-toc-row,
+.rf-toc-item[data-level="5"] > .rf-toc-row,
+.rf-toc-item[data-level="6"] > .rf-toc-row {
+  padding-left: 40px;
+}
+
+.rf-toc-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+  transform: rotate(90deg);
+}
+
+.rf-toc-toggle:hover {
+  background: var(--hover);
+  color: var(--fg);
+}
+
+.rf-toc-item.is-collapsed > .rf-toc-row .rf-toc-toggle {
+  transform: rotate(0deg);
+}
+
+.rf-toc-toggle.is-leaf {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.rf-toc-link {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.rf-toc-link:hover {
+  color: var(--accent);
+}
+
+/* ---------- 提示条 ---------- */
+
+.rf-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  z-index: 100;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.9);
+  color: #fff;
+  font-size: 13px;
+  opacity: 0;
+  transform: translate(-50%, 8px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  pointer-events: none;
+}
+
+.rf-toast.is-visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
