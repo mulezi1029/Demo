@@ -100,6 +100,13 @@
     }
 
     decorate(section, heading) {
+      // 标题文本包一层：操作按钮占用标题右侧的空间，不再靠负偏移伸到容器外，
+      // 否则会被 .rf-body-inner 的 overflow: hidden 裁掉
+      const title = document.createElement('span');
+      title.className = 'rf-title';
+      while (heading.firstChild) title.appendChild(heading.firstChild);
+      heading.appendChild(title);
+
       const controls = document.createElement('div');
       controls.className = 'rf-controls';
 

@@ -99,13 +99,17 @@
       return;
     }
 
-    let tocHidden = false;
+    let stored = null;
     try {
-      tocHidden = localStorage.getItem(UI_KEY) === '1';
+      stored = localStorage.getItem(UI_KEY);
     } catch (error) {
-      tocHidden = false;
+      stored = null;
     }
-    if (tocHidden) document.body.classList.add('rf-toc-hidden');
+    // 窄屏目录是抽屉，默认收起，否则会盖住正文
+    const narrow = window.matchMedia('(max-width: 880px)').matches;
+    if (stored === '1' || (stored === null && narrow)) {
+      document.body.classList.add('rf-toc-hidden');
+    }
 
     const reader = new window.FoldingReader('#doc', {
       toc: '#toc',
@@ -116,6 +120,13 @@
 
     window.reader = reader; // 方便在控制台里试 API
     bindToolbar(reader);
+    if (narrow) {
+      document.getElementById('search').placeholder = '搜索';
+      // 抽屉形态下点完目录就收起来，别挡着正文
+      document.getElementById('toc').addEventListener('click', (event) => {
+        if (event.target.closest('.rf-toc-link')) document.body.classList.add('rf-toc-hidden');
+      });
+    }
     bindSearch(reader);
     bindProgress();
     openHash(reader);

@@ -8,20 +8,24 @@
 }
 
 .rf-section > :is(h1, h2, h3, h4, h5, h6) {
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-/* ---------- 标题左侧的折叠 / 复制按钮（悬停出现，和飞书一致） ---------- */
+.rf-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* ---------- 标题右侧的折叠 / 复制按钮（悬停变清晰，和飞书一致） ---------- */
 
 .rf-controls {
-  position: absolute;
-  left: -3.2rem;
-  top: 50%;
-  transform: translateY(-50%);
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 2px;
-  opacity: 0;
+  opacity: 0.35;
   transition: opacity 0.15s ease;
 }
 
@@ -30,9 +34,14 @@
   opacity: 1;
 }
 
+/* 已折叠的标题保留清晰的按钮，提示这里可以展开 */
+.rf-section.is-collapsed > :is(h1, h2, h3, h4, h5, h6) > .rf-controls {
+  opacity: 0.9;
+}
+
 @media (hover: none) {
   .rf-controls {
-    opacity: 0.85;
+    opacity: 0.8;
   }
 }
 
