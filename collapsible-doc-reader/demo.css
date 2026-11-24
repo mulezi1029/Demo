@@ -168,8 +168,10 @@ body {
   grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
 }
 
+/* 目录收起后侧栏 display: none，正文会落到第一列，
+   所以此时必须把网格收成单列，否则正文被塞进宽度为 0 的列里 */
 body.rf-toc-hidden .app-body {
-  grid-template-columns: 0 minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .app-sidebar {
