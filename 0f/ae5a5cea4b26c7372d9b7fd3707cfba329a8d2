@@ -1,0 +1,24 @@
+collapsible-doc-reader/docs/implementation.md
+  s_f0a1e3ebf019e2::t_9989455b146a03 198
+  s_f0a1e3ebf019e2::t_c367da598ee845 83-84,88
+  s_f0a1e3ebf019e2::t_6865fdf1f80b5a 55,59-74
+collapsible-doc-reader/README.md
+  s_f0a1e3ebf019e2::t_825e0496be249d 124
+  s_f0a1e3ebf019e2::t_f0e68ed01f37e5 106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "0fae5a5cea4b26c7372d9b7fd3707cfba329a8d2",
+  "prompts": {},
+  "sessions": {
+    "s_f0a1e3ebf019e2": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_nrr0k0m6ejir",
+        "model": "gpt-6.2-sol"
+      },
+      "human_author": "cy <cheny56@trip.com>"
+    }
+  }
+}
