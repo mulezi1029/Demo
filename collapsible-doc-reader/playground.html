@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoldingReader 测试工作台</title>
+<link rel="stylesheet" href="reader.css">
+<link rel="stylesheet" href="playground.css">
+</head>
+<body class="pg">
+
+<header class="pg-header">
+  <div class="pg-brand">
+    FoldingReader
+    <span>测试工作台</span>
+  </div>
+
+  <div class="pg-controls">
+    <div class="segmented" id="format" role="group" aria-label="输入格式">
+      <button type="button" data-format="auto" class="is-active">自动</button>
+      <button type="button" data-format="markdown">Markdown</button>
+      <button type="button" data-format="html">HTML</button>
+    </div>
+
+    <label class="pg-field">最大层级
+      <select id="max-level">
+        <option value="1">H1</option>
+        <option value="2">H2</option>
+        <option value="3" selected>H3</option>
+        <option value="4">H4</option>
+        <option value="6">H6</option>
+      </select>
+    </label>
+
+    <label class="pg-field">初始状态
+      <select id="initial-state">
+        <option value="expanded">全展开</option>
+        <option value="depth2">展开到 H2</option>
+        <option value="collapsed">全折叠</option>
+      </select>
+    </label>
+
+    <label class="pg-check"><input type="checkbox" id="show-toc" checked> 目录</label>
+    <label class="pg-check"><input type="checkbox" id="live" checked> 实时</label>
+    <button type="button" class="pg-btn" id="render">渲染 ⌘↵</button>
+  </div>
+</header>
+
+<main class="pg-body">
+  <section class="pg-pane pg-editor">
+    <div class="pg-pane-head">
+      <span class="pg-pane-title">输入</span>
+      <select id="samples" class="pg-samples" aria-label="示例模板">
+        <option value="basic">Markdown：技术方案</option>
+        <option value="table">Markdown：表格与代码</option>
+        <option value="nested">HTML：多层嵌套</option>
+        <option value="broken">HTML：非扁平结构（诊断示例）</option>
+        <option value="empty">空模板</option>
+      </select>
+      <span class="pg-count" id="char-count">0 字</span>
+    </div>
+    <textarea id="source" spellcheck="false" placeholder="把 Markdown 或 HTML 粘贴到这里…"></textarea>
+  </section>
+
+  <section class="pg-pane pg-preview">
+    <div class="pg-pane-head">
+      <span class="pg-pane-title">预览</span>
+      <span class="pg-badge" id="mode-badge">–</span>
+      <span class="pg-timing" id="timing"></span>
+    </div>
+    <div class="pg-preview-body" id="preview-body">
+      <aside class="pg-toc" id="preview-toc-wrap">
+        <nav id="preview-toc" class="rf-toc" aria-label="预览目录"></nav>
+      </aside>
+      <article class="pg-doc" id="preview-doc"></article>
+    </div>
+  </section>
+</main>
+
+<footer class="pg-status">
+  <div class="pg-stats" id="stats">等待输入…</div>
+  <ul class="pg-issues" id="diagnostics"></ul>
+</footer>
+
+<script src="vendor/marked.min.js"></script>
+<script src="reader.js"></script>
+<script src="playground.js"></script>
+</body>
+</html>

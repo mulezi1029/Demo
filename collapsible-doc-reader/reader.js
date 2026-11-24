@@ -31,6 +31,7 @@
       this.searchInput = typeof searchInput === 'string' ? document.querySelector(searchInput) : searchInput || null;
 
       this.storageKey = options.storageKey || `rf:${document.title || location.pathname}`;
+      this.persistEnabled = options.persist !== false;
       this.minLevel = options.minLevel || 1;
       this.maxLevel = options.maxLevel || 3;
 
@@ -210,7 +211,12 @@
 
     walkToc(host, list) {
       Array.from(host.children).forEach((child) => {
-        if (!child.classList || !child.classList.contains('rf-section')) return;
+        if (!child.classList || !child.classList.contains('rf-section')) {
+          // 源文档常有一层包装容器（如 <div class="markdown-body">），
+          // 目录要能穿过去继续找 section，否则整列目录会是空的
+          if (child.children && child.children.length) this.walkToc(child, list);
+          return;
+        }
         const meta = this.meta.get(child);
         if (!meta) return;
 
@@ -281,7 +287,7 @@
     /* ------------------------------ 搜索 ------------------------------ */
 
     bindShortcuts() {
-      document.addEventListener('keydown', (event) => {
+      this.keyHandler = (event) => {
         const mod = event.metaKey || event.ctrlKey;
         if (mod && event.key.toLowerCase() === 'f' && this.searchInput) {
           event.preventDefault();
@@ -292,7 +298,23 @@
           this.searchInput.value = '';
           this.clearSearch();
         }
-      });
+      };
+      document.addEventListener('keydown', this.keyHandler);
+    }
+
+    /** 解绑全局监听，重复渲染同一容器时调用，避免监听器与观察器堆积 */
+    destroy() {
+      if (this.observer) {
+        this.observer.disconnect();
+        this.observer = null;
+      }
+      if (this.keyHandler) {
+        document.removeEventListener('keydown', this.keyHandler);
+        this.keyHandler = null;
+      }
+      this.tocNodes.clear();
+      this.sections = [];
+      this.activeSection = null;
     }
 
     /** 返回命中数量；命中项的祖先链会自动展开（对应飞书 ⌘F 展开折叠标题） */
@@ -410,6 +432,7 @@
     }
 
     persist() {
+      if (!this.persistEnabled) return;
       try {
         const collapsed = this.sections
           .filter((section) => section.classList.contains('is-collapsed'))
@@ -427,6 +450,7 @@
     }
 
     restore() {
+      if (!this.persistEnabled) return;
       let saved = null;
       try {
         saved = JSON.parse(localStorage.getItem(this.storageKey) || 'null');
