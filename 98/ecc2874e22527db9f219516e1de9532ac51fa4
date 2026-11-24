@@ -1,0 +1,19 @@
+collapsible-doc-reader/demo.css
+  s_f0a1e3ebf019e2::t_de0f853b768536 171-172,174
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "98ecc2874e22527db9f219516e1de9532ac51fa4",
+  "prompts": {},
+  "sessions": {
+    "s_f0a1e3ebf019e2": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_nrr0k0m6ejir",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "cy <cheny56@trip.com>"
+    }
+  }
+}
