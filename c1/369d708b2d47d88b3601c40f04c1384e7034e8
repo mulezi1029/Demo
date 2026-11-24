@@ -1,0 +1,24 @@
+collapsible-doc-reader/docs/implementation.md
+  s_f0a1e3ebf019e2::t_daabb90a1de787 1-10,12-18,20-83,86-169,171,175-211
+  s_f0a1e3ebf019e2::t_4170d0eb83cd24 170,172-174
+  s_f0a1e3ebf019e2::t_823005fea746ad 84-85
+  s_f0a1e3ebf019e2::t_199a6b427cdd98 11,19
+collapsible-doc-reader/README.md
+  s_f0a1e3ebf019e2::t_f80be20090627b 86-89
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "c1369d708b2d47d88b3601c40f04c1384e7034e8",
+  "prompts": {},
+  "sessions": {
+    "s_f0a1e3ebf019e2": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_nrr0k0m6ejir",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "cy <cheny56@trip.com>"
+    }
+  }
+}
