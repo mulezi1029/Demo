@@ -1,0 +1,40 @@
+collapsible-doc-reader/playground.html
+  s_f0a1e3ebf019e2::t_73fe01d8a4f36b 1-89
+collapsible-doc-reader/reader.js
+  s_f0a1e3ebf019e2::t_82a1f88e81716d 435
+  s_f0a1e3ebf019e2::t_f8de33652e6b7f 214-219
+  s_f0a1e3ebf019e2::t_4d6b5762310dd6 290,301-317
+  s_f0a1e3ebf019e2::t_23a5efcbb10436 34
+  s_f0a1e3ebf019e2::t_7e93a6511f17d2 453
+collapsible-doc-reader/README.md
+  s_f0a1e3ebf019e2::t_423cbd8bc4579d 127-131
+  s_f0a1e3ebf019e2::t_2d31fae6abd849 11,18,25-36,50-61
+collapsible-doc-reader/playground.css
+  s_f0a1e3ebf019e2::t_ea3586f04e8eec 1-465
+README.md
+  s_f0a1e3ebf019e2::t_06f41c3664d6d4 7
+collapsible-doc-reader/index.html
+  s_f0a1e3ebf019e2::t_992b5e5be484bd 62-63
+collapsible-doc-reader/playground.js
+  s_f0a1e3ebf019e2::t_1b9958f09d9a0a 1-198,200-313,321-323,325-377
+  s_f0a1e3ebf019e2::t_47b3c0720fb2bc 199
+  s_f0a1e3ebf019e2::t_237eff6b1a1775 314-320,324
+collapsible-doc-reader/vendor/marked.min.js
+  s_f0a1e3ebf019e2::t_284f48efe7b06f 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "c5b7e25ed7d3ba7b4ef535eb6a73fc785918b2e9",
+  "prompts": {},
+  "sessions": {
+    "s_f0a1e3ebf019e2": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_nrr0k0m6ejir",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "cy <cheny56@trip.com>"
+    }
+  }
+}
