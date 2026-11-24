@@ -1,0 +1,31 @@
+collapsible-doc-reader/reader.css
+  s_f0a1e3ebf019e2::t_64911d48c87f44 11-13,16-21,24,28,37-41,44
+collapsible-doc-reader/reader.js
+  s_f0a1e3ebf019e2::t_db93c7f42aa766 103-109
+collapsible-doc-reader/index.html
+  s_f0a1e3ebf019e2::t_fdabfc62f2555e 57
+  s_f0a1e3ebf019e2::t_16fb7126df2d69 133-136
+collapsible-doc-reader/demo.js
+  s_f0a1e3ebf019e2::t_7de906acde6bc3 102,104,106-111
+  s_f0a1e3ebf019e2::t_f93c892803a7ce 123-129
+collapsible-doc-reader/README.md
+  s_f0a1e3ebf019e2::t_f433f71a575481 93
+  s_f0a1e3ebf019e2::t_48c1ed9f0bad1d 5-6
+  s_f0a1e3ebf019e2::t_18b9116dc21ed8 90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.52-trip",
+  "base_commit_sha": "da751af85564d54051a43db3e9d983d66e7aaeaa",
+  "prompts": {},
+  "sessions": {
+    "s_f0a1e3ebf019e2": {
+      "agent_id": {
+        "tool": "chengxiaobang",
+        "id": "s_nrr0k0m6ejir",
+        "model": "DeepSeek-V4.1-Flash"
+      },
+      "human_author": "cy <cheny56@trip.com>"
+    }
+  }
+}
